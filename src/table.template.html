@@ -1,0 +1,46 @@
+<table class="table" [ngClass]="class">
+  <thead *ngIf="showHeader" class="thead-dark">
+    <th>  
+      <input class="form-check-input" type="checkbox" 
+        [indeterminate]="isIndeterminate"
+        [checked]="allSelected"
+        (change)="selectAll($event)"> 
+    </th>
+    <th *ngFor="let col of columns" 
+      [style.width]="col.width" 
+      [ngClass]="col.headerClass">
+      {{ col.name }}
+    </th>
+  </thead>
+  <tbody [@loadData]="loadData ? 'loading' : 'ready'">
+    <tr *ngFor="let data of tableData | async; let i = index;" 
+      [class.selected-row]="rowsSelected.has(i)" 
+      [style.cursor]="selectedRowClass != '' ? 'pointer': ''">
+        <td>
+          <input class="form-check-input form-check-input-lg" type="checkbox" 
+          (change)="changeSelection(i)" 
+          [checked]="rowsSelected.has(i)">
+        </td>
+        <td *ngFor="let col of columns; trackBy:trackFn" 
+          [ngClass]="col.cellClass" 
+          [ngClass]="col.classValue ? col.classValue(data[col.property]) : ''"
+          (click)="onSelected(data, i)">
+           {{ prepareValue(data, col) }}
+        </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <button class="btn btn-danger" (click)="deleteRows()">Delete Selected</button>
+  </tfoot>
+</table>
+<nav>
+  <ul class="pagination text-right">
+    <li class="page-item">
+      <button class="btn btn-secondary" (click)="prevPage()" [disabled]="prevDisabled">❮</button>
+    </li>
+    <li class="page-item">  {{ currPage }}  </li>
+    <li class="page-item">
+      <button class="btn btn-secondary" (click)="nextPage()" [disabled]="nextDisabled">❯</button>
+    </li>
+  </ul>
+</nav>
